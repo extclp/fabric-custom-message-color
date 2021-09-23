@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.extclp.fabric.message.color.mixins",
+  "compatibilityLevel": "JAVA_16",
+  "client": [
+    "MixinChatHudListener"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
