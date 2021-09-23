@@ -12,6 +12,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,11 +34,12 @@ public class CustomMessageColorMod implements ModInitializer {
             try {
                 JsonObject data = new JsonParser().parse(Files.readString(CONFIG_PATH)).getAsJsonObject();
                 color = Formatting.byName(data.getAsJsonPrimitive("color").getAsString());
-            }catch (Exception e) {
+            }catch (IOException e) {
                 e.printStackTrace();
             }
         }
         DISPATCHER.register(literal("message-color")
+                        .executes(context -> resetMessageColor(context.getSource()))
             .then(argument("color", ColorArgumentType.color())
                 .executes(context ->
                     execute(context.getSource(), context.getArgument("color", Formatting.class))
@@ -46,13 +48,25 @@ public class CustomMessageColorMod implements ModInitializer {
         );
     }
 
+    public static int resetMessageColor(FabricClientCommandSource source){
+       try {
+           Files.delete(CONFIG_PATH);
+           CustomMessageColorMod.color = null;
+           source.sendFeedback(new LiteralText("已重置私信字体的颜色"));
+           return 1;
+       }catch (IOException e){
+           e.printStackTrace();
+           return 0;
+       }
+    }
+
     public static int execute(FabricClientCommandSource source, Formatting color) {
         try {
             Files.writeString(CONFIG_PATH, GSON.toJson(Map.of("color", color.getName())), StandardCharsets.UTF_8);
             CustomMessageColorMod.color = color;
             source.sendFeedback(new LiteralText("已修改私信字体的颜色"));
             return 1;
-        }catch (Exception e){
+        }catch (IOException e){
             e.printStackTrace();
             return 0;
         }
