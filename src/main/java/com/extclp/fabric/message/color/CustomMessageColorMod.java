@@ -50,7 +50,7 @@ public class CustomMessageColorMod implements ModInitializer {
 
     public static int resetMessageColor(FabricClientCommandSource source){
        try {
-           Files.delete(CONFIG_PATH);
+           Files.deleteIfExists(CONFIG_PATH);
            CustomMessageColorMod.color = null;
            source.sendFeedback(new LiteralText("已重置私信字体的颜色"));
            return 1;
